@@ -3,13 +3,13 @@ import 'package:indf_factory/supabase.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-typedef SupabaseAutoScrollListQueryBuilder<ItemType> = PostgrestTransformBuilder<List<ItemType>> Function(SupabaseClient client, int startRange, int endRange);
-typedef SupabaseAutoScrollListWidgetBuilder<ItemType> = Widget Function(BuildContext context, ItemType item, int index);
+typedef QueryBuilder<ItemType> = PostgrestTransformBuilder<List<ItemType>> Function(SupabaseClient client, int startRange, int endRange);
+typedef RenderBuilder<ItemType> = Widget Function(BuildContext context, ItemType item, int index);
 
 
 class SupabaseAutoScrollListWidget<ItemType> extends StatefulWidget {
-  final SupabaseAutoScrollListQueryBuilder<ItemType> queryBuilder;
-  final SupabaseAutoScrollListWidgetBuilder<ItemType> itemBuilder;
+  final QueryBuilder<ItemType> queryBuilder;
+  final RenderBuilder<ItemType> itemBuilder;
   final int pageSize;
 
   /*
