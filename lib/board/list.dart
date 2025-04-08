@@ -3,9 +3,8 @@ import 'package:indf_factory/supabase.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-typedef QueryBuilder = Future<List<Map<String, dynamic>>> Function(SupabaseClient client, int startRange, int endRange);
+typedef QueryBuilder = Future<List<dynamic>> Function(SupabaseClient client, int startRange, int endRange);
 typedef RenderBuilder = Widget Function(BuildContext context, Map<String, dynamic> item, int index);
-
 
 class SupabaseAutoScrollListWidget extends StatefulWidget {
   final QueryBuilder queryBuilder;
@@ -34,15 +33,18 @@ class _AutoScrollWidgetState extends State<SupabaseAutoScrollListWidget> {
     fetchPage: fetchPage,
   );
 
-
   Future<List<Map<String, dynamic>>> fetchPage(int pageKey) async {
     try {
       final client = SupabaseInstance().client;
       final startRange = (pageKey - 1) * widget.pageSize;
       final endRange = pageKey * widget.pageSize - 1;
-      final newItems = await widget.queryBuilder(client, startRange, endRange);
-      lastPage = newItems.length < widget.pageSize;
-      return newItems; // 새로운 방식에서는 데이터를 반환하면 자동 추가됨
+      final dynamicList = await widget.queryBuilder(client, startRange, endRange);
+      if (dynamicList.any((element) => element is! Map<String, dynamic>)) {
+        throw Exception("queryResult 에 Map<String, dynamic> 타입이 아닌 요소가 포함되어 있습니다.");
+      }
+      final List<Map<String, dynamic>> queryResult = dynamicList.cast<Map<String, dynamic>>();
+      lastPage = queryResult.length < widget.pageSize;
+      return queryResult; // 새로운 방식에서는 데이터를 반환하면 자동 추가됨
     } catch (error) {
       throw Exception("데이터 로드 실패: $error"); // 오류 발생 시 예외 처리
     }
