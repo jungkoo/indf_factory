@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'location.dart';
 
-class MapViewWidget extends StatelessWidget {
+class LocationViewWidget extends StatelessWidget {
   final Marker marker;
   final Circle? circle;
 
-  const MapViewWidget({super.key, required this.marker, this.circle});
+  const LocationViewWidget({super.key, required this.marker, this.circle});
 
   @override
   Widget build(BuildContext context) {
