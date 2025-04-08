@@ -1,7 +1,8 @@
 import 'package:flutter/widgets.dart';
-import 'package:indf_factory/supabase.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '../initialize.dart';
 
 typedef QueryBuilder = Future<List<dynamic>> Function(SupabaseClient client, int startRange, int endRange);
 typedef RenderBuilder = Widget Function(BuildContext context, Map<String, dynamic> item, int index);

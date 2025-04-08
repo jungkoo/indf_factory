@@ -1,55 +1,33 @@
 
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import '../initialize.dart';
 
 typedef LocationWithBuilder = Widget Function(BuildContext context, LatLng location);
 
 class LocationBuilder extends StatelessWidget {
   final LocationWithBuilder builder;
-  final LatLng? _defaultValue;
 
-  const LocationBuilder({super.key, required this.builder, LatLng? defaultValue}) : _defaultValue = defaultValue;
+  const LocationBuilder({super.key, required this.builder});
 
-
+  /*
+   * 위치 권한을 요청하고 위치를 가져오는 위젯
+   * builder 에서 위치를 사용하여 위젯을 그린다
+   */
   @override
-  Widget build(BuildContext context) {
-    final defaultLocation = _defaultValue ??  const LatLng(37.4200, 127.1265);
-    return FutureBuilder<LatLng>(
+  Widget build(BuildContext context) => FutureBuilder<LatLng>(
       // 현재 위치를 가져 온다
-      future: _getCurrentLocation(),
+      future: LocationInstance().currentLocation(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          debugPrint('Error: 현재 위치를 가져오는 중 오류가 발생했습니다 ${snapshot.error}');
-          return Center(
-                child: Text("위치 권한을 가져오지 못했습니다"),
-          );
         } else if (snapshot.hasData) {
           return builder(context, snapshot.data!);
+        } else if (snapshot.hasError) {
+          return Center(child: Text("위치 권한 없음"));
         } else {
-          return builder(context, defaultLocation);
+          return Center(child: Text("xml 설정에 권한과 API 키추가 필요"));
         }
       }
     );
-  }
-
-  Future<LatLng> _getCurrentLocation() async {
-    final LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.always || permission == LocationPermission.whileInUse) {
-      final currentPosition = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-      return LatLng(currentPosition.latitude, currentPosition.longitude);
-    } else {
-      // 사용자 권한 요청
-      final requestPermission = await Geolocator.requestPermission();
-      if (requestPermission == LocationPermission.always || requestPermission == LocationPermission.whileInUse) {
-        final currentPosition = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-        return LatLng(currentPosition.latitude, currentPosition.longitude);
-      } else {
-        debugPrint("위치 권한이 거부됨: $requestPermission");
-      }
-      return _defaultValue ?? const LatLng(37.4200, 127.1265);
-    }
-  }
 }
