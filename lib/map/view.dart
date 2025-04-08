@@ -5,8 +5,18 @@ import 'location.dart';
 class LocationViewWidget extends StatelessWidget {
   final Marker marker;
   final Circle? circle;
+  final double zoom;
+  final bool myLocationButtonEnabled;
+  final bool myLocationEnabled;
 
-  const LocationViewWidget({super.key, required this.marker, this.circle});
+  const LocationViewWidget({
+    super.key,
+    required this.marker,
+    this.circle,
+    this.zoom=13.0,
+    this.myLocationButtonEnabled=true,
+    this.myLocationEnabled=true
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -15,10 +25,10 @@ class LocationViewWidget extends StatelessWidget {
         return GoogleMap(
           initialCameraPosition: CameraPosition(
             target: location,
-            zoom: 13.0,
+            zoom: zoom,
           ),
-          myLocationButtonEnabled: true, // 현재 위치 버튼 활성화
-          myLocationEnabled: true, // 현재 위치 표시 활성화
+          myLocationButtonEnabled: myLocationButtonEnabled, // 현재 위치 버튼 활성화
+          myLocationEnabled: myLocationEnabled, // 현재 위치 표시 활성화
           markers: <Marker>{marker},
           circles: <Circle>{_createCircle(location)},
         );
