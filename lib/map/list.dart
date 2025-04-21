@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:indf_factory/indf_location.dart';
 import 'package:indf_factory/map/location.dart';
 import 'package:indf_factory/map/view.dart';
 import '../indf_supabase.dart';
 
 class SupabaseLocationListWidget extends StatefulWidget {
   final RenderBuilder renderBuilder;
+  final MarkerBuilder markerBuilder;
   final QueryBuilder queryBuilder;
   final int pageSize;
 
-  const SupabaseLocationListWidget({super.key, required this.renderBuilder, this.pageSize = 10, required this.queryBuilder});
+  const SupabaseLocationListWidget({super.key, required this.renderBuilder, this.pageSize = 10, required this.queryBuilder, required this.markerBuilder});
 
   @override
   State<StatefulWidget> createState() => _SupabaseLocationListWidgetState();
@@ -47,7 +49,7 @@ class _SupabaseLocationListWidgetState extends State<SupabaseLocationListWidget>
     }
   }
 
-  // 지고 그리기
+  // 지도 그리기
   Widget _createMapWidget(BuildContext context2, LatLng location) {
     return FutureBuilder<List<Map<String, dynamic>>> (
       future: searchMapData(),
@@ -60,13 +62,7 @@ class _SupabaseLocationListWidgetState extends State<SupabaseLocationListWidget>
         } else if (snapshot.hasData) {
           final List<Map<String, dynamic>> data = snapshot.data!;
           return LocationViewWidget(
-            marker: data.map((item) => Marker(
-
-              //TODO:// 마커 생성하는 로직 필요
-              markerId: MarkerId(item['id'].toString()),
-              position: LatLng(item['latitude'], item['longitude']),
-              infoWindow: InfoWindow(title: item['name']),
-            )).toSet(),
+            marker: data.map((item) => widget.markerBuilder(item)).toSet(),
             circle: null,
             zoom: 13.0,
             myLocationButtonEnabled: true, // 현재 위치 버튼 활성화

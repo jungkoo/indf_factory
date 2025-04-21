@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+// Map<String, dynamic> 에서 마커 유도
+typedef MarkerBuilder = Marker Function(Map<String, dynamic> item);
+
 class LocationInstance {
   static final LocationInstance _instance = LocationInstance._internal();
   final LatLng _seoulCityHall = LatLng(37.5662952, 126.9779451);
