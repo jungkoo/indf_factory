@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:indf_factory/board/list.dart';
 import 'package:indf_factory/indf_location.dart';
 import 'package:indf_factory/map/location.dart';
 import 'package:indf_factory/map/view.dart';
@@ -11,7 +12,13 @@ class SupabaseLocationListWidget extends StatefulWidget {
   final QueryBuilder queryBuilder;
   final int pageSize;
 
-  const SupabaseLocationListWidget({super.key, required this.renderBuilder, this.pageSize = 10, required this.queryBuilder, required this.markerBuilder});
+  const SupabaseLocationListWidget({
+    super.key,
+    required this.renderBuilder,
+    required this.queryBuilder,
+    required this.markerBuilder,
+    this.pageSize = 10
+  });
 
   @override
   State<StatefulWidget> createState() => _SupabaseLocationListWidgetState();
@@ -27,7 +34,7 @@ class _SupabaseLocationListWidgetState extends State<SupabaseLocationListWidget>
         return Stack(
           alignment: AlignmentDirectional.topCenter,
           children: [
-            _createMapWidget(context, location),
+            _createMapWidget(location),
             _createDraggableScrollableSheet(location),
           ],
         );
@@ -38,7 +45,7 @@ class _SupabaseLocationListWidgetState extends State<SupabaseLocationListWidget>
   Future<List<Map<String, dynamic>>> searchMapData() async {
     try {
       final client = SupabaseInstance().client;
-      final dynamicList = await widget.queryBuilder(client, 0, widget.pageSize);
+      final dynamicList = await widget.queryBuilder(client, searchParameter, 0, widget.pageSize);
       if (dynamicList.any((element) => element is! Map<String, dynamic>)) {
         throw Exception("queryResult 에 Map<String, dynamic> 타입이 아닌 요소가 포함되어 있습니다.");
       }
@@ -50,7 +57,7 @@ class _SupabaseLocationListWidgetState extends State<SupabaseLocationListWidget>
   }
 
   // 지도 그리기
-  Widget _createMapWidget(BuildContext context2, LatLng location) {
+  Widget _createMapWidget(LatLng location) {
     return FutureBuilder<List<Map<String, dynamic>>> (
       future: searchMapData(),
       builder: (context, snapshot) {
@@ -72,14 +79,6 @@ class _SupabaseLocationListWidgetState extends State<SupabaseLocationListWidget>
           return Text("데이터 없음");
         }
       },
-
-    );
-    return LocationViewWidget(
-      marker: <Marker>{},
-      circle: null,
-      zoom: 13.0,
-      myLocationButtonEnabled: true, // 현재 위치 버튼 활성화
-      myLocationEnabled: true, // 현재 위치 표시 활성화
     );
   }
 
@@ -113,7 +112,12 @@ class _SupabaseLocationListWidgetState extends State<SupabaseLocationListWidget>
   }
 
   Widget _createAutoListWidget(ScrollController scroller, LatLng location) {
-    //TODO: 목록형 그리기
-    return Text("");
+    return SupabaseAutoScrollListWidget(
+        queryBuilder: widget.queryBuilder,
+        renderBuilder: widget.renderBuilder,
+        searchParameter: searchParameter,
+        pageSize: widget.pageSize,
+        scrollController: scroller,
+    );
   }
 }

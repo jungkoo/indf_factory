@@ -5,6 +5,8 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 class SupabaseAutoScrollListWidget extends StatefulWidget {
   final QueryBuilder queryBuilder;
   final RenderBuilder renderBuilder;
+  final Map<String, String> searchParameter;
+  final ScrollController? scrollController;
   final int pageSize;
 
   /*
@@ -14,7 +16,9 @@ class SupabaseAutoScrollListWidget extends StatefulWidget {
     super.key,
     required this.queryBuilder,
     required this.renderBuilder,
+    this.searchParameter = const {},
     this.pageSize = 10,
+    this.scrollController
   });
 
   @override
@@ -34,7 +38,7 @@ class _AutoScrollWidgetState extends State<SupabaseAutoScrollListWidget> {
       final client = SupabaseInstance().client;
       final startRange = (pageKey - 1) * widget.pageSize;
       final endRange = pageKey * widget.pageSize - 1;
-      final dynamicList = await widget.queryBuilder(client, startRange, endRange);
+      final dynamicList = await widget.queryBuilder(client, widget.searchParameter, startRange, endRange);
       if (dynamicList.any((element) => element is! Map<String, dynamic>)) {
         throw Exception("queryResult 에 Map<String, dynamic> 타입이 아닌 요소가 포함되어 있습니다.");
       }
@@ -51,6 +55,7 @@ class _AutoScrollWidgetState extends State<SupabaseAutoScrollListWidget> {
     controller: _pagingController,
     builder: (context, state, fetchNextPage) => PagedListView<int, Map<String, dynamic>>(
       state: state,
+      scrollController: widget.scrollController ?? ScrollController(),
       fetchNextPage: fetchNextPage,
       builderDelegate: PagedChildBuilderDelegate(
         itemBuilder: (context, item, index) {
@@ -60,3 +65,4 @@ class _AutoScrollWidgetState extends State<SupabaseAutoScrollListWidget> {
     ),
   );
 }
+
