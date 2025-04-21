@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:indf_factory/initialize.dart';
 import 'package:indf_factory/map/location.dart';
 import 'package:indf_factory/map/view.dart';
-
-import '../board/list.dart';
+import '../indf_supabase.dart';
 
 class SupabaseLocationListWidget extends StatefulWidget {
   final RenderBuilder renderBuilder;

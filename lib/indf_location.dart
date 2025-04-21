@@ -1,8 +1,6 @@
-
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LocationInstance {
   static final LocationInstance _instance = LocationInstance._internal();
@@ -43,29 +41,4 @@ class LocationInstance {
 
     return _currentLocation??_seoulCityHall;
   }
-}
-
-
-class SupabaseInstance {
-
-  static final SupabaseInstance _instance = SupabaseInstance._internal();
-
-  factory SupabaseInstance() {
-    return _instance;
-  }
-
-  /*
-   * Main 에서 선 초기화 필요함
-   * await SupabaseInstance().initialize(url, key);
-   */
-  initialize(String url, String key) async {
-    await Supabase.initialize(
-      url: url,
-      anonKey: key,
-    );
-  }
-
-  SupabaseInstance._internal();
-
-  SupabaseClient get client => Supabase.instance.client;
 }
