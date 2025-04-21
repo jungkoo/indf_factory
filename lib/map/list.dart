@@ -14,9 +14,9 @@ class SupabaseLocationListWidget extends StatefulWidget {
 
   const SupabaseLocationListWidget({
     super.key,
-    required this.renderBuilder,
     required this.queryBuilder,
     required this.markerBuilder,
+    required this.renderBuilder,
     this.pageSize = 10
   });
 
@@ -42,10 +42,10 @@ class _SupabaseLocationListWidgetState extends State<SupabaseLocationListWidget>
     );
   }
 
-  Future<List<Map<String, dynamic>>> searchMapData() async {
+  Future<List<Map<String, dynamic>>> searchMapData(LatLng location) async {
     try {
       final client = SupabaseInstance().client;
-      final dynamicList = await widget.queryBuilder(client, searchParameter, 0, widget.pageSize);
+      final dynamicList = await widget.queryBuilder(client, searchParameter, location, 0, widget.pageSize);
       if (dynamicList.any((element) => element is! Map<String, dynamic>)) {
         throw Exception("queryResult 에 Map<String, dynamic> 타입이 아닌 요소가 포함되어 있습니다.");
       }
@@ -59,7 +59,7 @@ class _SupabaseLocationListWidgetState extends State<SupabaseLocationListWidget>
   // 지도 그리기
   Widget _createMapWidget(LatLng location) {
     return FutureBuilder<List<Map<String, dynamic>>> (
-      future: searchMapData(),
+      future: searchMapData(location),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
@@ -68,8 +68,9 @@ class _SupabaseLocationListWidgetState extends State<SupabaseLocationListWidget>
           return Center(child: Text('오류가 발생했습니다.'));
         } else if (snapshot.hasData) {
           final List<Map<String, dynamic>> data = snapshot.data!;
+          // print("markers ==> ${data.map((item) => widget.markerBuilder(item)).whereType<Marker>().toSet()}");
           return LocationViewWidget(
-            marker: data.map((item) => widget.markerBuilder(item)).toSet(),
+            marker: data.map((item) => widget.markerBuilder(item)).whereType<Marker>().toSet(),
             circle: null,
             zoom: 13.0,
             myLocationButtonEnabled: true, // 현재 위치 버튼 활성화

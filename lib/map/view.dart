@@ -39,6 +39,8 @@ class LocationViewWidget extends StatelessWidget {
 
   // 좌표가 같으면 노출이 안되기 때문에 같으면 약간 어긋난 좌표를 만들어 준다
   Set<Marker> _createMarker(Set<Marker> originalMarkers) {
+    print("originalMarkers==> $originalMarkers");
+
     final Set<LatLng> duplicationCheck = {};
     final Set<Marker> normalizeMarker = {};
     for(final marker in originalMarkers) {

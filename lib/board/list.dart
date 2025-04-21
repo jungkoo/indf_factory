@@ -38,7 +38,8 @@ class _AutoScrollWidgetState extends State<SupabaseAutoScrollListWidget> {
       final client = SupabaseInstance().client;
       final startRange = (pageKey - 1) * widget.pageSize;
       final endRange = pageKey * widget.pageSize - 1;
-      final dynamicList = await widget.queryBuilder(client, widget.searchParameter, startRange, endRange);
+      // location 비어있음
+      final dynamicList = await widget.queryBuilder(client, widget.searchParameter, null, startRange, endRange);
       if (dynamicList.any((element) => element is! Map<String, dynamic>)) {
         throw Exception("queryResult 에 Map<String, dynamic> 타입이 아닌 요소가 포함되어 있습니다.");
       }
