@@ -25,7 +25,17 @@ class SupabaseLocationListWidget extends StatefulWidget {
 }
 
 class _SupabaseLocationListWidgetState extends State<SupabaseLocationListWidget> {
-  final Map<String, String> searchParameter = {};
+  late QueryParameter queryParameter;
+
+  @override
+  void initState() {
+    super.initState();
+    queryParameter = QueryParameter(
+      parameters: {},
+      pageNum: 1,
+      pageSize: widget.pageSize,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +55,8 @@ class _SupabaseLocationListWidgetState extends State<SupabaseLocationListWidget>
   Future<List<Map<String, dynamic>>> searchMapData(LatLng location) async {
     try {
       final client = SupabaseInstance().client;
-      final dynamicList = await widget.queryBuilder(client, searchParameter, location, 0, widget.pageSize);
+
+      final dynamicList = await widget.queryBuilder(client, queryParameter);
       if (dynamicList.any((element) => element is! Map<String, dynamic>)) {
         throw Exception("queryResult 에 Map<String, dynamic> 타입이 아닌 요소가 포함되어 있습니다.");
       }
@@ -116,8 +127,7 @@ class _SupabaseLocationListWidgetState extends State<SupabaseLocationListWidget>
     return SupabaseAutoScrollListWidget(
         queryBuilder: widget.queryBuilder,
         renderBuilder: widget.renderBuilder,
-        searchParameter: searchParameter,
-        pageSize: widget.pageSize,
+        queryParameter: queryParameter,
         scrollController: scroller,
     );
   }

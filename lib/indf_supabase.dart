@@ -4,11 +4,28 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 // SupabaseClient 를 사용하여 데이터를 가져오는 함수 표현
-typedef QueryBuilder = Future<List<dynamic>> Function(SupabaseClient client, Map<String, String> parameters, LatLng? current, int startRange, int endRange);
+typedef QueryBuilder = Future<List<dynamic>> Function(SupabaseClient client, QueryParameter queryParameter);
 
 // QueryBuilder 의 결과를 widget 으로 만드는 함수 표현
 typedef RenderBuilder = Widget Function(BuildContext context, Map<String, dynamic> item, int index);
 
+// 사용자 검색을 처리하기위한 파라미터 클래스
+class QueryParameter {
+  LatLng? location;
+  Map<String, String> parameters;
+  int pageNum;
+  final int pageSize;
+
+  QueryParameter({
+    this.location,
+    required this.parameters,
+    this.pageNum = 1,
+    this.pageSize = 10,
+  });
+
+  int get startRange => (pageNum - 1) * pageSize;
+  int get endRange => pageNum * pageSize;
+}
 
 class SupabaseInstance {
 

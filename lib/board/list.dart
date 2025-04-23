@@ -5,9 +5,8 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 class SupabaseAutoScrollListWidget extends StatefulWidget {
   final QueryBuilder queryBuilder;
   final RenderBuilder renderBuilder;
-  final Map<String, String> searchParameter;
+  final QueryParameter queryParameter;
   final ScrollController? scrollController;
-  final int pageSize;
 
   /*
    * 자동 스크롤 위젯
@@ -16,8 +15,7 @@ class SupabaseAutoScrollListWidget extends StatefulWidget {
     super.key,
     required this.queryBuilder,
     required this.renderBuilder,
-    this.searchParameter = const {},
-    this.pageSize = 10,
+    required this.queryParameter,
     this.scrollController
   });
 
@@ -26,6 +24,7 @@ class SupabaseAutoScrollListWidget extends StatefulWidget {
 }
 
 class _AutoScrollWidgetState extends State<SupabaseAutoScrollListWidget> {
+  late QueryParameter queryParameter;
   bool lastPage = false;
 
   late final PagingController<int, Map<String, dynamic>> _pagingController = PagingController<int, Map<String, dynamic>>(
@@ -33,18 +32,22 @@ class _AutoScrollWidgetState extends State<SupabaseAutoScrollListWidget> {
     fetchPage: fetchPage,
   );
 
+  @override
+  void initState() {
+    super.initState();
+    queryParameter = widget.queryParameter;
+  }
+
   Future<List<Map<String, dynamic>>> fetchPage(int pageKey) async {
     try {
       final client = SupabaseInstance().client;
-      final startRange = (pageKey - 1) * widget.pageSize;
-      final endRange = pageKey * widget.pageSize - 1;
-      // location 비어있음
-      final dynamicList = await widget.queryBuilder(client, widget.searchParameter, null, startRange, endRange);
+      queryParameter.pageNum = pageKey; // 페이지 번호 설정
+      final dynamicList = await widget.queryBuilder(client, queryParameter);
       if (dynamicList.any((element) => element is! Map<String, dynamic>)) {
         throw Exception("queryResult 에 Map<String, dynamic> 타입이 아닌 요소가 포함되어 있습니다.");
       }
       final List<Map<String, dynamic>> queryResult = dynamicList.cast<Map<String, dynamic>>();
-      lastPage = queryResult.length < widget.pageSize;
+      lastPage = queryResult.length < queryParameter.pageSize;
       return queryResult; // 새로운 방식에서는 데이터를 반환하면 자동 추가됨
     } catch (error) {
       throw Exception("데이터 로드 실패: $error"); // 오류 발생 시 예외 처리
