@@ -25,6 +25,11 @@ class QueryParameter {
 
   int get startRange => (pageNum - 1) * pageSize;
   int get endRange => pageNum * pageSize;
+
+  @override
+  String toString() {
+    return "QueryParameter(location: $location, parameters: $parameters, pageNum: $pageNum, pageSize: $pageSize)";
+  }
 }
 
 class SupabaseInstance {

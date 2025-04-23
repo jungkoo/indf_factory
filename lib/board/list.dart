@@ -5,7 +5,7 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 class SupabaseAutoScrollListWidget extends StatefulWidget {
   final QueryBuilder queryBuilder;
   final RenderBuilder renderBuilder;
-  final QueryParameter queryParameter;
+  final QueryParameter? queryParameter;
   final ScrollController? scrollController;
 
   /*
@@ -15,7 +15,7 @@ class SupabaseAutoScrollListWidget extends StatefulWidget {
     super.key,
     required this.queryBuilder,
     required this.renderBuilder,
-    required this.queryParameter,
+    this.queryParameter,
     this.scrollController
   });
 
@@ -35,7 +35,7 @@ class _AutoScrollWidgetState extends State<SupabaseAutoScrollListWidget> {
   @override
   void initState() {
     super.initState();
-    queryParameter = widget.queryParameter;
+    queryParameter = widget.queryParameter!;
   }
 
   Future<List<Map<String, dynamic>>> fetchPage(int pageKey) async {

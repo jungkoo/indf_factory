@@ -41,6 +41,7 @@ class _SupabaseLocationListWidgetState extends State<SupabaseLocationListWidget>
   Widget build(BuildContext context) {
     return LocationBuilder(
       builder: (context, location) {
+        queryParameter.location = location;
         return Stack(
           alignment: AlignmentDirectional.topCenter,
           children: [
