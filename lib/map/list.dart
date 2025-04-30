@@ -20,7 +20,7 @@ class SupabaseLocationListWidget extends StatefulWidget {
     required this.markerBuilder,
     required this.renderBuilder,
     this.pageSize = 10,
-    this.zoom = 13.0
+    this.zoom = 15.0
   });
 
   @override
@@ -32,8 +32,9 @@ class _SupabaseLocationListWidgetState extends State<SupabaseLocationListWidget>
   late LatLng _initialLocation;
   late LatLng _mapLocation;
   Timer? _debounceTimer; // 지도 이동 할때 잦은 호출을 막기 위한 방법
-
   bool _isLoading = true;
+  bool _isFirstLoad = false;
+  // List<Map<String, dynamic>> firstPageResult = [];
 
   @override
   void initState() {
@@ -49,7 +50,9 @@ class _SupabaseLocationListWidgetState extends State<SupabaseLocationListWidget>
         _initialLocation = location;
         _mapLocation = location;
         _isLoading = false;
+        _isFirstLoad = true;
       });
+      _isFirstLoad = false;
     });
   }
 
@@ -74,9 +77,9 @@ class _SupabaseLocationListWidgetState extends State<SupabaseLocationListWidget>
     return FutureBuilder<List<Map<String, dynamic>>> (
       future: searchMapData(),
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
+        if (_isFirstLoad && snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
+        } else  if (snapshot.hasError) {
           debugPrint('Error: ${snapshot.error}');
           return Center(child: Text('오류가 발생했습니다.'));
         } else if (snapshot.hasData) {
@@ -127,7 +130,6 @@ class _SupabaseLocationListWidgetState extends State<SupabaseLocationListWidget>
       throw Exception("데이터 로드 실패: $error"); // 오류 발생 시 예외 처리
     }
   }
-
 
   Widget _createDraggableScrollableSheet() {
     return  DraggableScrollableSheet(
