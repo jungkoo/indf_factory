@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:indf_factory/extensions/google_map.dart';
-import 'location.dart';
+import 'package:indf_factory/map/location.dart';
 
 class LocationViewWidget extends StatelessWidget {
   final Set<Marker> marker;
@@ -9,13 +9,11 @@ class LocationViewWidget extends StatelessWidget {
   final double zoom;
   final bool myLocationButtonEnabled;
   final bool myLocationEnabled;
-  final Function(LatLng location)? onChangeLocation;
   final LatLng? initialLocation;
 
   const LocationViewWidget({
     super.key,
     required this.marker,
-    this.onChangeLocation,
     this.circle,
     this.zoom=13.0,
     this.myLocationButtonEnabled=true,
@@ -36,10 +34,6 @@ class LocationViewWidget extends StatelessWidget {
           myLocationEnabled: myLocationEnabled, // 현재 위치 표시 활성화
           markers: marker.deduplicate(),
           circles: <Circle>{location.currentCircle},
-          onCameraMove: (CameraPosition position) {
-            print("onCameraMove ==> ${position.target}");
-            onChangeLocation?.call(position.target);
-          },
         );
       },
     );
