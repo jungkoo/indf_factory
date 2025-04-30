@@ -13,6 +13,7 @@ class SupabaseLocationListWidget extends StatefulWidget {
   final QueryBuilder queryBuilder;
   final int pageSize;
   final double zoom;
+  final double minDistanceMeters;
 
   const SupabaseLocationListWidget({
     super.key,
@@ -20,7 +21,8 @@ class SupabaseLocationListWidget extends StatefulWidget {
     required this.markerBuilder,
     required this.renderBuilder,
     this.pageSize = 10,
-    this.zoom = 15.0
+    this.zoom = 15.0,
+    this.minDistanceMeters = 100
   });
 
   @override
@@ -34,7 +36,7 @@ class _SupabaseLocationListWidgetState extends State<SupabaseLocationListWidget>
   Timer? _debounceTimer; // 지도 이동 할때 잦은 호출을 막기 위한 방법
   bool _isLoading = true;
   bool _isFirstLoad = false;
-  // List<Map<String, dynamic>> firstPageResult = [];
+
 
   @override
   void initState() {
@@ -91,15 +93,16 @@ class _SupabaseLocationListWidgetState extends State<SupabaseLocationListWidget>
             ),
             myLocationButtonEnabled: true, // 현재 위치 버튼 활성화
             myLocationEnabled: true, // 현재 위치 표시 활성화
+            zoomControlsEnabled: true, // 줌확대 버튼 활성화
+            zoomGesturesEnabled: true, // 손가락 핀치로 확대 활성화
             markers: (data.map((item) => widget.markerBuilder(item)).whereType<Marker>().toSet()).deduplicate(),
             circles: <Circle>{_initialLocation.currentCircle},
             onCameraMove: (position) {
               _debounceTimer?.cancel();
               _debounceTimer = Timer(Duration(seconds: 1), () {
-                if (_isLoading) return;
-                if (!mounted) return;
+                if (_isLoading || !mounted) return;
                 if (position.target == queryParameter.location) return; // 위치가 같으면 업데이트 X
-
+                if (_mapLocation.distanceMeters(position.target) < widget.minDistanceMeters) return; // 너무 가까우면 무시
                 _isLoading = true;
                 setState(() {
                   _mapLocation = position.target;

@@ -23,6 +23,17 @@ extension LatLngExtension on LatLng {
       strokeWidth: 2,
     );
   }
+
+  double distanceMeters(LatLng other) {
+    const earthRadius = 6371000; // in meters
+    final dLat = (other.latitude - latitude) * pi / 180;
+    final dLon = (other.longitude - longitude) * pi / 180;
+    final a = sin(dLat / 2) * sin(dLat / 2) +
+        cos(latitude * pi / 180) * cos(other.latitude * pi / 180) *
+            sin(dLon / 2) * sin(dLon / 2);
+    final c = 2 * atan2(sqrt(a), sqrt(1 - a));
+    return earthRadius * c;
+  }
 }
 
 extension MarkerExtension on Marker {
