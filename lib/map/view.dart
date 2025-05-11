@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'location.dart';
+import 'package:indf_factory/extensions/google_map.dart';
+import 'package:indf_factory/map/location.dart';
 
 class LocationViewWidget extends StatelessWidget {
-  final Marker marker;
+  final Set<Marker> marker;
   final Circle? circle;
   final double zoom;
   final bool myLocationButtonEnabled;
   final bool myLocationEnabled;
+  final LatLng? initialLocation;
 
   const LocationViewWidget({
     super.key,
@@ -15,7 +17,8 @@ class LocationViewWidget extends StatelessWidget {
     this.circle,
     this.zoom=13.0,
     this.myLocationButtonEnabled=true,
-    this.myLocationEnabled=true
+    this.myLocationEnabled=true,
+    this.initialLocation
   });
 
   @override
@@ -24,27 +27,18 @@ class LocationViewWidget extends StatelessWidget {
       builder: (context, location) {
         return GoogleMap(
           initialCameraPosition: CameraPosition(
-            target: location,
+            target: initialLocation??location,
             zoom: zoom,
           ),
           myLocationButtonEnabled: myLocationButtonEnabled, // 현재 위치 버튼 활성화
           myLocationEnabled: myLocationEnabled, // 현재 위치 표시 활성화
-          markers: <Marker>{marker},
-          circles: <Circle>{_createCircle(location)},
+          markers: marker.deduplicate(),
+          circles: <Circle>{location.currentCircle},
         );
       },
     );
   }
 
-  Circle _createCircle(LatLng location) {
-    return Circle(
-      circleId: CircleId('currentLocation'),
-      center: location,
-      radius: 200,
-      fillColor: Colors.yellow.withAlpha(76),
-      strokeColor: Colors.orange,
-      strokeWidth: 2,
-    );
-  }
+
 
 }

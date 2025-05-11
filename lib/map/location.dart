@@ -1,7 +1,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import '../initialize.dart';
+import 'package:indf_factory/indf_location.dart';
+
 
 typedef LocationWithBuilder = Widget Function(BuildContext context, LatLng location);
 
